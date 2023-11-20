@@ -1,19 +1,19 @@
 porcentaje_i=0.0
 #valor inicial
-ci=1
+ci=50000
 #valor final
 cf=0
 #tiempo
-time=0
+time=3
 intervalo="año"
 #tasa de interes
-ti=4
+ti=30
 ti=ti/100
 tasai=ti
 intervalo2='años'
 ##################
 #Iteres
-i=3
+i=0
 #############
 fecha=12
 
