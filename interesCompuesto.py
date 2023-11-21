@@ -1,7 +1,7 @@
 import math as map
-ci=6613.63
-ti=18; intervalo="mensual"
-time=8; intervalo2="mensual"
+ci=8000
+ti=36; intervalo="mensual"
+time=4; intervalo2="anual"
 iconpuesto=0
 cf=0
 retiro=0
