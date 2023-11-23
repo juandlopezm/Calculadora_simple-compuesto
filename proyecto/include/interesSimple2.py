@@ -86,7 +86,7 @@ def interes_simple():
                 meses = (dias_totales % 365) // 30
                 dias = (dias_totales % 365) % 30
                 # Convertir la parte decimal a días, horas, minutos, segundos y milisegundos
-                tiempo = " " + str(anos) + " " + str(meses) + " " + str(dias)
+                tiempo = " " + str(parte_entera) + " " + str(meses) + " " + str(dias)
                 intervalo = " AÑO  MES DIA"
                 # Mostrar el desglose de la fecha
                 print(f"Años: {anos}")
@@ -120,12 +120,8 @@ def interes_simple():
             )  # Borrar el contenido existente en la entrada var
             entries["i"].insert(tk.END, str(i))
 
-            entries["intervalo2"].delete(
-                0, tk.END
-            )  
-            entries["intervalo2"].insert(
-                tk.END, str(intervalo2)
-            )  
+            entries["intervalo2"].delete(0, tk.END)
+            entries["intervalo2"].insert(tk.END, str(intervalo2))
 
             entries["tiempo"].delete(
                 0, tk.END
@@ -173,8 +169,12 @@ def interes_simple():
     btn_limpiar = tk.Button(simple_form_frame, text="Limpiar", command=limpiar_campos)
     btn_limpiar.grid(row=row + 1, columnspan=2, padx=10, pady=10)
 
-
 def interes_compuesto():
+    def limpiar_campos():
+        for entry in entries.values():
+            entry.delete(0, tk.END)
+            entry.insert(tk.END, "0")
+
     # Función para obtener los valores del formulario
     def obtener_valores():
         try:
@@ -260,6 +260,50 @@ def interes_compuesto():
 
             print(cf, ci, ti, (iconpuesto - retiro), time)
 
+            entries["cf"].delete(
+                0, tk.END
+            )  # Borrar el contenido existente en la entrada tir
+            entries["cf"].insert(tk.END, str(cf))  # Insertar el nuevo valor de TIR
+
+            entries["ci"].delete(
+                0, tk.END
+            )  # Borrar el contenido existente en la entrada var
+            entries["ci"].insert(tk.END, str(ci))  # Insertar el nuevo valor de VAR
+
+            entries["ti"].delete(
+                0, tk.END
+            )  # Borrar el contenido existente en la entrada var
+            entries["ti"].insert(tk.END, str(ti))  # Insertar el nuevo valor de VAR
+
+            entries["i"].delete(
+                0, tk.END
+            )  # Borrar el contenido existente en la entrada var
+            entries["i"].insert(tk.END, str(iconpuesto))
+
+            entries["intervalo2"].delete(0, tk.END)
+            entries["intervalo2"].insert(tk.END, str(intervalo2))
+
+            entries["tiempo"].delete(
+                0, tk.END
+            )  # Borrar el contenido existente en la entrada var
+            entries["tiempo"].insert(
+                tk.END, str(time)
+            )  # Insertar el nuevo valor de VAR  # Insertar el nuevo valor de VAR
+
+            entries["intervalo"].delete(
+                0, tk.END
+            )  # Borrar el contenido existente en la entrada tir
+            entries["intervalo"].insert(
+                tk.END, str(intervalo)
+            )  # Insertar el nuevo valor de TIR
+
+            entries["retiro"].delete(
+                0, tk.END
+            )  # Borrar el contenido existente en la entrada tir
+            entries["retiro"].insert(
+                tk.END, str(iconpuesto - retiro)
+            )  # Insertar el nuevo valor de TIR
+
         except ValueError:
             messagebox.showerror("Error", "Ingresa números válidos")
 
@@ -284,45 +328,15 @@ def interes_compuesto():
     )
     btn_obtener_valores.grid(row=row, columnspan=2, padx=10, pady=10)
 
-
-""" def tir():
-    # Función para obtener los valores del formulario
-
-    def obtener_valores():
-        try:
-            ci = float(entries["ci"].get())
-            ti = float(entries["ti"].get())
-
-
-            # Realizar acciones con los valores obtenidos
-            # Ejemplo: Imprimir los valores
-            print(f"ci: {ci}")
-            print(f"ti: {ti}")
-
-        except ValueError:
-            messagebox.showerror("Error", "Ingresa números válidos")
-
-    tir_form_frame = tk.Frame(main_frame)
-    tir_form_frame.pack(padx=20, pady=20)
-
-    labels = ["ci","ti"]
-    global entries
-    entries = {}
-    row = 0
-    for label_text in labels:
-        label = tk.Label(tir_form_frame, text=label_text)
-        label.grid(row=row, column=0, padx=10, pady=5)
-
-        entry = tk.Entry(tir_form_frame)
-        entry.grid(row=row, column=1, padx=10, pady=5)
-        entries[label_text] = entry
-        row += 1
-
     btn_obtener_valores = tk.Button(
-        tir_form_frame, text="Obtener Valores", command=obtener_valores
+        compound_form_frame, text="Obtener Valores", command=obtener_valores
     )
-    btn_obtener_valores.grid(row=row, columnspan=2, padx=10, pady=10) """
+    btn_obtener_valores.grid(row=row, columnspan=2, padx=10, pady=10)
 
+    btn_limpiar = tk.Button(
+        compound_form_frame, text="Limpiar", command=limpiar_campos
+    )
+    btn_limpiar.grid(row=row+1, columnspan=2, padx=10, pady=10)
 
 def obtener_valores():
     try:
@@ -366,7 +380,6 @@ def obtener_valores():
     except ValueError:
         messagebox.showerror("Error", "Ingresa números válidos")
 
-
 def actualizar_tabla(ci, ti):
     # Limpiar la tabla actual
     for row in tabla.get_children():
@@ -378,7 +391,6 @@ def actualizar_tabla(ci, ti):
     # Insertar los nuevos valores en la tabla
     for key, value in valores:
         tabla.insert("", "end", text=key, values=(value,))
-
 
 def agregar_elemento():
     try:
@@ -393,6 +405,11 @@ def agregar_elemento():
             "Error", "Ingresa un nombre válido y un número para el valor"
         )
 
+def eliminar_ultimo_elemento():
+    global tabla
+    seleccion = tabla.selection()
+    if seleccion:  # Verificar si hay una fila seleccionada
+        tabla.delete(seleccion[-1])  # Eliminar la última fila seleccionada
 
 def tir():
     global entries
@@ -434,10 +451,10 @@ def tir():
     )
     btn_agregar_elemento.grid(row=row + 1, columnspan=2, padx=10, pady=10)
 
-    btn_obtener_valores = tk.Button(
-        tir_form_frame, text="Obtener Valores", command=obtener_valores
+    btn_eliminar_elemento = tk.Button(
+        tir_form_frame, text="Eliminar Elemento", command=eliminar_ultimo_elemento
     )
-    btn_obtener_valores.grid(row=row + 2, columnspan=2, padx=10, pady=10)
+    btn_eliminar_elemento.grid(row=row + 3, columnspan=2, padx=10, pady=10)
 
     # Crear una tabla inicial vacía
     global tabla
@@ -445,6 +462,13 @@ def tir():
     tabla.heading("#0", text="flujo")
     tabla.heading("Valor", text="renovar")
     tabla.pack(padx=20, pady=20)
+
+    btn_obtener_valores = tk.Button(
+        tir_form_frame, text="Obtener Valores", command=obtener_valores
+    )
+    btn_obtener_valores.grid(row=row + 2, columnspan=2, padx=10, pady=10)
+
+    
 
 
 def clear_frame():
