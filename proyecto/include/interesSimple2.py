@@ -473,40 +473,26 @@ def tir():
     )
     btn_obtener_valores.grid(row=row + 2, columnspan=2, padx=10, pady=10)
 
-def calcular_monto(P, r, n,v):
+def calcular_monto(P, r, n,v,fecha,fecha2):
     r = convertir_tasa_a_decimal(r)
     if v=="VP":
-        resultado = P*((((1 + r)**n) - 1) / r)
-        return resultado
+        if fecha=="anual" and fecha2=="semestral":
+            resultado = P*((((1 + r)**(n*2)) - 1) / r)
+        else:
+            resultado = P*((((1 + r)**n) - 1) / r)
     else:
-        resultado = P*((1-((1 + r)**(-n))) / r)
-        return resultado
-
-def capitalizacion(fecha):
-    if fecha=="anual":
-        r=r/1
-    elif fecha=="mensual":
-        r=r/12
-    elif fecha=="semestral":
-        r=r/2
-    elif fecha=="trimestral":
-        r=r/4
-    elif fecha=="cuatrimestral":
-        r=r/3
-    elif fecha=="bimestral":
-        r=r/6
-    elif fecha=="diario":
-        r=r/360
-    elif fecha=="quincenal":
-        r=r/24
-
+        if fecha=="mensual" and fecha2=="anual":
+            resultado = P*((1-((1 + (r/12))**(-n))) / (r/12))
+        else:
+            resultado = P*((1-((1 + r)**(-n))) / r)
+    return resultado
+        
 def calcular_plazo(P, r, resultado):
     r = convertir_tasa_a_decimal(r)
     n = math.log(P / (P - resultado * r)) / math.log(1 + r)
     return n
 
 def calcular_tasa(P, resultado, n):
-    r = convertir_tasa_a_decimal(r)
     r = ((resultado / P) ** (1 / n)) - 1
     return r
 
@@ -534,14 +520,18 @@ def anualidades():
             n = float(entries["n"].get()) #  periodo 
             v = str(entries["v"].get()) # eleccion
             resultado = float(entries["resultado"].get()) #monto o capital
+            enganche = float(entries["enganche"].get())
+            fecha = str(entries["fecha"].get())
+            fecha2 = str(entries["fecha2"].get())
 
             # Realizar acciones con los valores obtenidos
-            # Ejemplo: Imprimir los valores
-
+            # Ejemplo: Imprimir los valores 
 
             #llamar 
+           
             if resultado==0:
-                resultado = calcular_monto(P, r, n,v)
+                resultado = calcular_monto(P, r, n,v,fecha,fecha2)
+                resultado+=enganche
                 print(f"El monto de la anualidad es: {resultado:.2f}")
             if n==0:
                 n = calcular_plazo(P, r, resultado)
@@ -554,6 +544,30 @@ def anualidades():
                 print(f"La renta de la anualidad es: {P:.2f}")
 
 
+            entries["P"].delete(
+                0, tk.END
+            )  # Borrar el contenido existente en la entrada tir
+            entries["P"].insert(tk.END, str(P))  # Insertar el nuevo valor de TIR
+
+            entries["r"].delete(
+                0, tk.END
+            )  # Borrar el contenido existente en la entrada var
+            entries["r"].insert(tk.END, str(r))  # Insertar el nuevo valor de VAR
+
+            entries["n"].delete(
+                0, tk.END
+            )  # Borrar el contenido existente en la entrada var
+            entries["n"].insert(tk.END, str(n))
+            
+            entries["v"].delete(
+                0, tk.END
+            )  # Borrar el contenido existente en la entrada var
+            entries["v"].insert(tk.END, str(v))
+
+            entries["resultado"].delete(
+                0, tk.END
+            )  # Borrar el contenido existente en la entrada var
+            entries["resultado"].insert(tk.END, str(resultado))
 
             print(f"p: {P}")
             print(f"r: {r}")
@@ -567,7 +581,7 @@ def anualidades():
     simple_form_frame = tk.Frame(main_frame)
     simple_form_frame.pack(padx=20, pady=20)
 
-    labels = ["P", "r","n","v","resultado"]
+    labels = ["P", "r","n","v","resultado","enganche","fecha","fecha2"]
     global entries
     entries = {}
     row = 0
