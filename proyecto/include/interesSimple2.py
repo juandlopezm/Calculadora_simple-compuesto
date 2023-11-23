@@ -1,3 +1,4 @@
+import math
 import tkinter as tk
 from tkinter import messagebox
 import tkinter as tk
@@ -169,6 +170,7 @@ def interes_simple():
     btn_limpiar = tk.Button(simple_form_frame, text="Limpiar", command=limpiar_campos)
     btn_limpiar.grid(row=row + 1, columnspan=2, padx=10, pady=10)
 
+
 def interes_compuesto():
     def limpiar_campos():
         for entry in entries.values():
@@ -333,10 +335,9 @@ def interes_compuesto():
     )
     btn_obtener_valores.grid(row=row, columnspan=2, padx=10, pady=10)
 
-    btn_limpiar = tk.Button(
-        compound_form_frame, text="Limpiar", command=limpiar_campos
-    )
-    btn_limpiar.grid(row=row+1, columnspan=2, padx=10, pady=10)
+    btn_limpiar = tk.Button(compound_form_frame, text="Limpiar", command=limpiar_campos)
+    btn_limpiar.grid(row=row + 1, columnspan=2, padx=10, pady=10)
+
 
 def obtener_valores():
     try:
@@ -380,6 +381,7 @@ def obtener_valores():
     except ValueError:
         messagebox.showerror("Error", "Ingresa números válidos")
 
+
 def actualizar_tabla(ci, ti):
     # Limpiar la tabla actual
     for row in tabla.get_children():
@@ -391,6 +393,7 @@ def actualizar_tabla(ci, ti):
     # Insertar los nuevos valores en la tabla
     for key, value in valores:
         tabla.insert("", "end", text=key, values=(value,))
+
 
 def agregar_elemento():
     try:
@@ -405,11 +408,13 @@ def agregar_elemento():
             "Error", "Ingresa un nombre válido y un número para el valor"
         )
 
+
 def eliminar_ultimo_elemento():
     global tabla
     seleccion = tabla.selection()
     if seleccion:  # Verificar si hay una fila seleccionada
         tabla.delete(seleccion[-1])  # Eliminar la última fila seleccionada
+
 
 def tir():
     global entries
@@ -468,7 +473,125 @@ def tir():
     )
     btn_obtener_valores.grid(row=row + 2, columnspan=2, padx=10, pady=10)
 
-    
+def calcular_monto(P, r, n,v):
+    r = convertir_tasa_a_decimal(r)
+    if v=="VP":
+        resultado = P*((((1 + r)**n) - 1) / r)
+        return resultado
+    else:
+        resultado = P*((1-((1 + r)**(-n))) / r)
+        return resultado
+
+def capitalizacion(fecha):
+    if fecha=="anual":
+        r=r/1
+    elif fecha=="mensual":
+        r=r/12
+    elif fecha=="semestral":
+        r=r/2
+    elif fecha=="trimestral":
+        r=r/4
+    elif fecha=="cuatrimestral":
+        r=r/3
+    elif fecha=="bimestral":
+        r=r/6
+    elif fecha=="diario":
+        r=r/360
+    elif fecha=="quincenal":
+        r=r/24
+
+def calcular_plazo(P, r, resultado):
+    r = convertir_tasa_a_decimal(r)
+    n = math.log(P / (P - resultado * r)) / math.log(1 + r)
+    return n
+
+def calcular_tasa(P, resultado, n):
+    r = convertir_tasa_a_decimal(r)
+    r = ((resultado / P) ** (1 / n)) - 1
+    return r
+
+def calcular_renta(resultado, r, n):
+    r = convertir_tasa_a_decimal(r)
+    P = resultado * r / ((1 + r)**n - 1)
+    return P
+
+def convertir_tasa_a_decimal(r):
+    if  str(r).endswith("0"):
+        return r / 100  # Divide entre 100 si es un número entero
+    return r  # Si es float, mantener el valor
+
+def anualidades():
+    # Función para obtener los valores del formulario
+    def limpiar_campos():
+        for entry in entries.values():
+            entry.delete(0, tk.END)
+            entry.insert(tk.END, "0")
+
+    def obtener_valores():
+        try:
+            P = float(entries["P"].get()) #renta
+            r = float(entries["r"].get()) # interes
+            n = float(entries["n"].get()) #  periodo 
+            v = str(entries["v"].get()) # eleccion
+            resultado = float(entries["resultado"].get()) #monto o capital
+
+            # Realizar acciones con los valores obtenidos
+            # Ejemplo: Imprimir los valores
+
+
+            #llamar 
+            if resultado==0:
+                resultado = calcular_monto(P, r, n,v)
+                print(f"El monto de la anualidad es: {resultado:.2f}")
+            if n==0:
+                n = calcular_plazo(P, r, resultado)
+                print(f"El plazo de la anualidad es: {n:.2f}")
+            if r==0:
+                r = calcular_tasa(P, resultado, n)
+                print(f"La tasa de interés es: {r:.4f}")
+            if P==0:
+                P= calcular_renta(resultado, r, n)
+                print(f"La renta de la anualidad es: {P:.2f}")
+
+
+
+            print(f"p: {P}")
+            print(f"r: {r}")
+            print(f"n: {n}")
+            print(f"v: {v}")
+            print(f"resultado {resultado}")
+
+        except ValueError:
+            messagebox.showerror("Error", "Ingresa números válidos")
+
+    simple_form_frame = tk.Frame(main_frame)
+    simple_form_frame.pack(padx=20, pady=20)
+
+    labels = ["P", "r","n","v","resultado"]
+    global entries
+    entries = {}
+    row = 0
+    for label_text in labels:
+        label = tk.Label(simple_form_frame, text=label_text)
+        label.grid(row=row, column=0, padx=10, pady=5)
+
+        entry = tk.Entry(simple_form_frame)
+        entry.grid(row=row, column=1, padx=10, pady=5)
+        entries[label_text] = entry
+        row += 1
+
+    btn_obtener_valores = tk.Button(
+        simple_form_frame, text="Obtener Valores", command=obtener_valores
+    )
+    btn_obtener_valores.grid(row=row, columnspan=2, padx=10, pady=10)
+
+    btn_obtener_valores = tk.Button(
+        simple_form_frame, text="Obtener Valores", command=obtener_valores
+    )
+    btn_obtener_valores.grid(row=row, columnspan=2, padx=10, pady=10)
+
+    btn_limpiar = tk.Button(simple_form_frame, text="Limpiar", command=limpiar_campos)
+    btn_limpiar.grid(row=row + 1, columnspan=2, padx=10, pady=10)
 
 
 def clear_frame():
@@ -493,13 +616,11 @@ def main():
 
     menubar = tk.Menu(root)
     file_menu = tk.Menu(menubar, tearoff=0)
-    file_menu.add_command(
-        label="Interés Simple", command=lambda: show_form(interes_simple)
-    )
-    file_menu.add_command(
-        label="Interés Compuesto", command=lambda: show_form(interes_compuesto)
-    )
+    file_menu.add_command(label="Interés Simple", command=lambda: show_form(interes_simple))
+    file_menu.add_command(label="Interés Compuesto", command=lambda: show_form(interes_compuesto))
     file_menu.add_command(label="TIR", command=lambda: show_form(tir))
+    file_menu.add_command(label="Anualidades", command=lambda: show_form(anualidades))
+    
     file_menu.add_separator()
     file_menu.add_command(label="Salir", command=salir)
 
